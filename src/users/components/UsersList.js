@@ -1,6 +1,8 @@
 import React from 'react';
 
 import UserItem from './UserItem'
+import Card from '../../shared/UiElements/Card'
+
 import './UsersList.css'
 
 const UsersList = props => {
