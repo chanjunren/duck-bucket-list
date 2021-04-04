@@ -2,8 +2,8 @@ import React from 'react';
 
 import UsersList from '../components/UsersList';
 
-const DUCK_DP_URL = "https://www.pinclipart.com/picdir/middle/531-5312019_kawaii-clipart-duck-picture-kawaii-cute-duck-cartoon.png";
-// const DUCK_DP_URL = "../resources/duck-1.png";
+const DUCK_DP_URL = "https://www.pinclipart.com/picdir/middle/531-5312019_kawaii-clipart-duck-picture-kawaii-cute-duck-cartoon.png"
+// const DUCK_DP_URL = "../../resources/duck-1.png";
 
 
 const Users = () => {
