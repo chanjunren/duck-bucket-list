@@ -1,22 +1,32 @@
 // Component for the links
-import React from 'react';
+import React, {useState} from 'react';
 import {Link} from 'react-router-dom';
 
 import MainHeader from './MainHeader';
 import NavLinks from './NavLinks';
-import SideDrawer from './SideDrawer'
+import SideDrawer from './SideDrawer';
+import Backdrop from '../UiElements/Backdrop';
+
 import './MainNavigation.css'
 
 const MainNavigation = props => {
+    const [isDrawerOpen, toggleDrawer] = useState(false);
+
+    const toggleSideDrawerHandler = () => {
+        toggleDrawer(!isDrawerOpen);
+    };
+
     return (
         <React.Fragment>
-            <SideDrawer>
+            {isDrawerOpen && <Backdrop onClick={toggleSideDrawerHandler}></Backdrop>}
+            {isDrawerOpen && (<SideDrawer>
                 <nav className="main-navigation__drawer-nav">
                     <NavLinks/>
                 </nav>
-            </SideDrawer>
+            </SideDrawer>)};
+            
             <MainHeader>
-                <button className="main-navigation__menu-btn">
+                <button className="main-navigation__menu-btn" onClick={toggleSideDrawerHandler}>
                     <span/>
                     <span/>
                     <span/>
