@@ -6,11 +6,10 @@ import Card from '../../shared/UiElements/Card';
 import './UserItem.css'
 
 const UserItem = props => {
-    console.log(props.image);
     return (
         <li className="user-item">
             <Card className="user-item__content">
-                <Link to={`/${props.id}/places}`}>
+                <Link to={`/${props.id}/places`}>
                     <div className="user-item__image">
                         <Avatar image={props.image} alt={props.name}/>
                     </div>
