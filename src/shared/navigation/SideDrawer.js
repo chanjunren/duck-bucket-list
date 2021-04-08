@@ -8,9 +8,9 @@ const SideDrawer = props => {
     const content = (
         <CSSTransition 
             in={props.show} 
-            timeout={200} 
+            timeout={500} 
             classNames="slide-in-left" 
-            mountOnEnter 
+            mountOnEnter
             unmountOnExit>
             <aside className="side-drawer" onClick={props.onClick}>{props.children}</aside>
         </CSSTransition> 
