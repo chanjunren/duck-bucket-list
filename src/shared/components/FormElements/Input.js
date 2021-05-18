@@ -1,8 +1,11 @@
 import React, {useReducer} from 'react';
 
+import {validate} from '../../util/FormValidators';
+
 import './Input.css';
 
 const CHANGE_ACTION = "CHANGE";
+const TOUCH_ACTION = "TOUCH";
 
 // Returns new state
 const inputReducer = (state, action) => {
@@ -11,9 +14,15 @@ const inputReducer = (state, action) => {
         case CHANGE_ACTION:
             return {
                 ...state,
-                value: action.value,
-                isValid: true
+                value: action.val,
+                isValid: validate(action.val, action.validators)
             };
+        case TOUCH_ACTION:
+            return {
+                ...state,
+                value: action.val,
+                isTouched: true
+            }
         default:
             return state;
     }
@@ -21,33 +30,47 @@ const inputReducer = (state, action) => {
 
 const Input = props => {
     // dispatch is a function 
-    const [inputState, dispatch] = useReducer(inputReducer, {type: `${CHANGE_ACTION}`, isValid: false})
+    const [inputState, dispatch] = useReducer(inputReducer, 
+        {value:'', isValid: false, isTouched: false})
 
-    const inputHandler = event => {
+    const changeHandler = event => {
         dispatch({
-            value: event.target.value,
-            type: `${CHANGE_ACTION}`
+            val: event.target.value,
+            type: `${CHANGE_ACTION}`,
+            validators: props.validators
         });
     };
+
+    const touchHandler = event => {
+        console.log("Event: " + event);
+        dispatch({
+            val: event.target.value,
+            type: `${TOUCH_ACTION}`
+        })
+
+    }
 
     const element = props.element === 'input' ? 
         (<input id={props.id} 
             type={props.type} 
             placeholder={props.placeholder} 
-            onInput={inputHandler}
+            onChange={changeHandler}
+            onBlur={touchHandler}
             value={inputState.value}
         />)
         : (<textarea 
             id={props.id} 
             rows={props.row || 3} 
-            onInput={inputHandler}
+            onChange={changeHandler}
+            onBlur={touchHandler}
             value={inputState.value}
         />) // if props.row is not defined
 
-    return (<div className={`form-control ${!inputState.isValid && 'form-control--invalid'}`}>
+    return (<div className={`form-control ${!inputState.isValid && inputState.isTouched && 
+        'form-control--invalid'}`}>
         <label htmlFor={props.id}>{props.label}</label>
         {element}
-        {!inputState.isValid && <p>{props.errorText}</p>}
+        {!inputState.isValid && inputState.isTouched && <p>{props.errorText}</p>}
     </div>)
 };
 
