@@ -47,13 +47,11 @@ const Input = props => {
     };
 
     const touchHandler = event => {
-        console.log("Event: " + event);
         dispatch({
             val: event.target.value,
             type: `${TOUCH_ACTION}`
-        })
-
-    }
+        });
+    };
 
     const element = props.element === 'input' ? 
         (<input id={props.id} 
