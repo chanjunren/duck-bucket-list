@@ -8,25 +8,48 @@ import './PlaceItem.css';
 
 // KEY | ID | IMAGEURL | TITLE | DESCRIPTION | ADDRESS | CREATOR ID | COORDINATES
 const PlaceItem = props => {
-  const [isModalVisible, toggleModalVisibility] = useState(false);
-  const modalEventHandler = () => {
-      console.log("Handler triggered: " + isModalVisible);
-      toggleModalVisibility(!isModalVisible);
+  const [isMapModalVisible, toggleMapModal] = useState(false);
+  const mapModalEventHandler = () => {
+      console.log("Handler triggered: " + isMapModalVisible);
+      toggleMapModal(!isMapModalVisible);
+  }
+
+  const [isDeleteModalVisible, toggleDeleteModal] = useState(false);
+  const deleteModalEventHandler = () => {
+    toggleDeleteModal(!isDeleteModalVisible);
+  }
+
+  const deleteEventHandler = () => {
+    console.log("DELETE EVENT CALLED");
+    toggleDeleteModal();
   }
 
   return (
     <React.Fragment>
       <Modal
-        show={isModalVisible}
-        onCancel={modalEventHandler}
+        show={isMapModalVisible}
+        onCancel={mapModalEventHandler}
         header={props.address}
         contentClass="place-item__modal-content"
         footerClass="place-item__modal-actions"
-        footer={<Button onClick={modalEventHandler}>CLOSE</Button>}
+        footer={<Button onClick={mapModalEventHandler}>CLOSE</Button>}
       >
         <div className="map-container">
           <Map center={props.coordinates} zoom={16} />
         </div>
+      </Modal>
+      <Modal
+        header="Are you sure?" 
+        show={isDeleteModalVisible}
+        onCancel={deleteModalEventHandler}
+        footerClass="place-item__modal-actions"
+        footer={
+          <React.Fragment>
+            <Button inverse onClick={deleteModalEventHandler}>CANCEL</Button>
+            <Button danger onClick={deleteEventHandler}>DELETE</Button>
+          </React.Fragment>
+        }>
+          <p>Are you sure you want to remove this? D:</p>
       </Modal>
       <li className="place-item">
         <Card className="place-item__content">
@@ -39,9 +62,9 @@ const PlaceItem = props => {
             <p>{props.description}</p>
           </div>
           <div className="place-item__actions">
-            <Button inverse onClick={modalEventHandler}>VIEW ON MAP</Button>
+            <Button inverse onClick={mapModalEventHandler}>VIEW ON MAP</Button>
             <Button to={`/places/${props.id}`}>EDIT</Button>
-            <Button danger>DELETE</Button>
+            <Button danger onClick={deleteModalEventHandler}>DELETE</Button>
           </div>
         </Card>
       </li>
