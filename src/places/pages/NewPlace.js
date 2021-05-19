@@ -1,4 +1,4 @@
-import React, { useCallback, useReducer } from 'react';
+import React from 'react';
 
 import Input from '../../shared/components/FormElements/Input';
 import Button from '../../shared/components/FormElements/Button';
@@ -6,62 +6,22 @@ import Button from '../../shared/components/FormElements/Button';
 import {VALIDATOR_MINLENGTH, VALIDATOR_REQUIRE} from '../../shared/util/FormValidators';
 
 import './NewPlace.css'
+import { useForm } from '../../shared/components/Hooks/FormHook';
 
-const initialState = {
-  inputs: {
-    titleInput: {
-      value: '',
-      isValid: false
-    }, 
-    descriptionInput: {
-      value: '',
-      isValid: false
-    }
-  },
-  isValid: false
-};
-
-const formReducer = (state, action) => {
-  switch (action.type) {
-    case "INPUT_CHANGE":
-      let formIsValid = true;
-      for (const inputId in state.inputs) {
-        if (inputId === action.inputId) {
-          formIsValid = formIsValid && action.isValid;
-        } else {
-          formIsValid = formIsValid && state.inputs[inputId].isValid;
-        }
-      }
-
-      const newState = {
-        ...state,
-        inputs: {
-          ...state.inputs,
-          [action.inputId]: {
-            value: action.value,
-            isValid: action.isValid
-          }
-        },
-        isValid: formIsValid
-      };
-
-      return newState; 
-    default:
-      return state;
+const initialInputs = {
+  titleInput: {
+    value: '',
+    isValid: false
+  }, 
+  descriptionInput: {
+    value: '',
+    isValid: false
   }
 };
 
 const NewPlace = () => {
-  const [formState, dispatch] = useReducer(formReducer, initialState)
-  const inputHandler = useCallback((id, value, isValid) => {
-    dispatch({
-      type: 'INPUT_CHANGE',
-      inputId: id,
-      value: value,
-      isValid: isValid
-    });
-  }, []);
-
+  const [formState, inputHandler] = useForm(initialInputs, false);
+  
   const submitNewPlaceHandler = event => {
     event.preventDefault();
     console.log(JSON.stringify(formState.inputs));
