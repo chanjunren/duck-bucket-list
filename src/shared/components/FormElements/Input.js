@@ -1,4 +1,4 @@
-import React, {useReducer} from 'react';
+import React, {useReducer, useEffect} from 'react';
 
 import {validate} from '../../util/FormValidators';
 
@@ -9,7 +9,6 @@ const TOUCH_ACTION = "TOUCH";
 
 // Returns new state
 const inputReducer = (state, action) => {
-    console.log(action);
     switch (action.type) {
         case CHANGE_ACTION:
             return {
@@ -31,7 +30,13 @@ const inputReducer = (state, action) => {
 const Input = props => {
     // dispatch is a function 
     const [inputState, dispatch] = useReducer(inputReducer, 
-        {value:'', isValid: false, isTouched: false})
+        {value:'', isValid: false, isTouched: false});
+
+    const {id, onInput} = props;
+    const {value, isValid} = inputState;
+    useEffect(() => {
+        onInput(id, value, isValid);
+    }, [id, value, isValid, onInput]);
 
     const changeHandler = event => {
         dispatch({
