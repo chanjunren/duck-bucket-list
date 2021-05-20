@@ -1,14 +1,14 @@
 import React, { useState } from 'react';
 
 
-import Input from '../../shared/components/FormElements/Input';
-import Button from '../../shared/components/FormElements/Button';
-import Card from '../../shared/components/UIElements/Card';
+import Input from '../../shared/components/formElements/Input';
+import Button from '../../shared/components/formElements/Button';
+import Card from '../../shared/components/uiElements/Card';
 
 import './Auth.css'
 
 import { VALIDATOR_EMAIL, VALIDATOR_MINLENGTH, VALIDATOR_REQUIRE } from '../../shared/util/FormValidators';
-import { useForm } from '../../shared/components/Hooks/FormHook';
+import { useForm } from '../../shared/components/hooks/FormHook';
 
 const Auth = props => {
     const [formState, inputHandler, setFormData] = useForm({}, false);

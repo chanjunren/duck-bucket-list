@@ -1,12 +1,12 @@
 import React from 'react';
 
-import Input from '../../shared/components/FormElements/Input';
-import Button from '../../shared/components/FormElements/Button';
+import Input from '../../shared/components/formElements/Input';
+import Button from '../../shared/components/formElements/Button';
 
 import {VALIDATOR_MINLENGTH, VALIDATOR_REQUIRE} from '../../shared/util/FormValidators';
 
 import './NewPlace.css'
-import { useForm } from '../../shared/components/Hooks/FormHook';
+import { useForm } from '../../shared/components/hooks/FormHook';
 
 const initialInputs = {
   titleInput: {

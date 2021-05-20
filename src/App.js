@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useCallback, useState} from 'react';
 import {
   BrowserRouter as Router,
   Route,
@@ -9,12 +9,24 @@ import {
 import Users from './user/pages/Users';
 import NewPlace from './places/pages/NewPlace';
 import UserPlaces from './places/pages/UserPlaces';
-import MainNavigation from './shared/components/Navigation/MainNavigation';
+import MainNavigation from './shared/components/navigation/MainNavigation';
 import UpdatePlace from './places/pages/UpdatePlace';
 import Auth from './user/pages/Auth';
+import { AuthContext } from './shared/components/context/AuthContext'
 
 const App = () => {
+  const [isLoggedIn, setLoginState] = useState(false);
+
+  const login = useCallback(() => {
+    setLoginState(true);
+  }, []);
+
+  const logout = useCallback(() => {
+    setLoginState(false);
+  }, []);
+
   return (
+    <AuthContext.Provider value={{isLoggedIn:isLoggedIn, login:login, logout:logout}}>
     <Router>
       <MainNavigation />
       <main>
@@ -38,6 +50,7 @@ const App = () => {
         </Switch>
       </main>
     </Router>
+    </AuthContext.Provider>
   );
 };
 

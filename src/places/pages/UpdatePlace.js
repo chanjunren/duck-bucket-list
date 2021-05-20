@@ -1,10 +1,10 @@
 import React, {useEffect, useState} from 'react';
 
 import { useParams } from 'react-router-dom';
-import Button from '../../shared/components/FormElements/Button';
-import Input from '../../shared/components/FormElements/Input';
-import { useForm } from '../../shared/components/Hooks/FormHook';
-import Card from '../../shared/components/UIElements/Card';
+import Button from '../../shared/components/formElements/Button';
+import Input from '../../shared/components/formElements/Input';
+import { useForm } from '../../shared/components/hooks/FormHook';
+import Card from '../../shared/components/uiElements/Card';
 import { VALIDATOR_MINLENGTH, VALIDATOR_REQUIRE } from '../../shared/util/FormValidators';
 
 const DUMMY_PLACES = [

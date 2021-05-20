@@ -1,7 +1,7 @@
 import React from 'react';
-import Button from '../../shared/components/FormElements/Button';
+import Button from '../../shared/components/formElements/Button';
 
-import Card from '../../shared/components/UIElements/Card';
+import Card from '../../shared/components/uiElements/Card';
 import PlaceItem from './PlaceItem';
 import './PlaceList.css';
 
