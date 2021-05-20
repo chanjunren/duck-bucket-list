@@ -1,12 +1,12 @@
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 
 
 import Input from '../../shared/components/formElements/Input';
 import Button from '../../shared/components/formElements/Button';
 import Card from '../../shared/components/uiElements/Card';
-
 import './Auth.css'
 
+import { AuthContext } from '../../shared/components/context/AuthContext';
 import { VALIDATOR_EMAIL, VALIDATOR_MINLENGTH, VALIDATOR_REQUIRE } from '../../shared/util/FormValidators';
 import { useForm } from '../../shared/components/hooks/FormHook';
 
@@ -14,6 +14,8 @@ const Auth = props => {
     const [formState, inputHandler, setFormData] = useForm({}, false);
 
     const [isLoginMode, toggleLoginMode] = useState(true);
+
+    const authContext = useContext(AuthContext);
 
     const switchButtonHandler = () => {
         if (!isLoginMode) {
@@ -40,9 +42,9 @@ const Auth = props => {
 
     const onLoginHandler = event => {
         event.preventDefault();
-        console.log("LOGIN: " + formState.inputs);
-        // console.log("Email: " + formState.inputs.emailInput.value);
-        // console.log("Password: " + formState.inputs.passwordInput.value);        
+        console.log("Login Email: " + formState.inputs.emailInput.value);
+        console.log("Login Password: " + formState.inputs.passwordInput.value);        
+        authContext.login();
     }
 
     const onSignUpHandler = event => {

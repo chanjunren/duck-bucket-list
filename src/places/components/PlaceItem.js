@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 
 import Card from '../../shared/components/uiElements/Card';
 import Button from '../../shared/components/formElements/Button';
@@ -6,8 +6,12 @@ import Modal from '../../shared/components/uiElements/Modal';
 import Map from '../../shared/components/uiElements/Map';
 import './PlaceItem.css';
 
+import { AuthContext } from '../../shared/components/context/AuthContext';
+
 // KEY | ID | IMAGEURL | TITLE | DESCRIPTION | ADDRESS | CREATOR ID | COORDINATES
 const PlaceItem = props => {
+  const authContext = useContext(AuthContext);
+
   const [isMapModalVisible, toggleMapModal] = useState(false);
   const mapModalEventHandler = () => {
       console.log("Handler triggered: " + isMapModalVisible);
@@ -63,8 +67,8 @@ const PlaceItem = props => {
           </div>
           <div className="place-item__actions">
             <Button inverse onClick={mapModalEventHandler}>VIEW ON MAP</Button>
-            <Button to={`/places/${props.id}`}>EDIT</Button>
-            <Button danger onClick={deleteModalEventHandler}>DELETE</Button>
+            {authContext.isLoggedIn && <Button to={`/places/${props.id}`}>EDIT</Button>}
+            {authContext.isLoggedIn && <Button danger onClick={deleteModalEventHandler}>DELETE</Button>}
           </div>
         </Card>
       </li>
