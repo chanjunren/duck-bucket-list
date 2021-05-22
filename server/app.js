@@ -1,17 +1,19 @@
 const express = require('express');
+const bodyParser = require('body-parser');
+
+const placesRoutes = require('./routes/places-routes');
 
 const app = express();
 
-console.log("Running server..");
+app.use('/api/places', placesRoutes);
 
-app.use((req, res, next) => {
-    console.log("I'm the middleware!");
-    // next();
-})
-
-app.use((req, res, next) => {
-    console.log("Request received!");
-    res.send('<form method="POST"><input type="text" name="username"/><button type="submit">HIHI</button></form>')
+// Error handling middleware
+app.use((error, req, res, next) => {
+    if (res.headerSent) {
+        return next(error);
+    }
+    res.status(error.code || 500);
+    res.json({message: error.message || 'Something went wrong on the server D: Please don\'t fire me'});
 })
 
 app.listen(5000);

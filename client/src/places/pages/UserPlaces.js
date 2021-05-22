@@ -19,14 +19,14 @@ const DUMMY_PLACES = [
   },
   {
     id: 'p2',
-    title: 'Empire State Building',
-    description: 'One of the most famous sky scrapers in the world!',
+    title: 'The Lofoten Islands',
+    description: 'Lofoten is known for excellent fishing, nature attractions such as the northern lights and the midnight sun, and small villages off the beaten track',
     imageUrl:
-      'https://upload.wikimedia.org/wikipedia/commons/thumb/d/df/NYC_Empire_State_Building.jpg/640px-NYC_Empire_State_Building.jpg',
-    address: '20 W 34th St, New York, NY 10001',
+      'https://img.traveltriangle.com/blog/wp-content/uploads/2018/11/lofoten1.jpg',
+    address: '8314 Gimsøysand, Norway',
     location: {
-      lat: 40.7484405,
-      lng: -73.9878584
+      lat: 68.4716466,
+      lng: 13.8568658
     },
     creator: 'u1'
   }
