@@ -1,11 +1,20 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 
-const placesRoutes = require('./routes/places-routes');
+const placesRoutes = require('./routes/places_routes');
+const HttpError = require('./models/http_error');
 
 const app = express();
 
+// Parse the body first and then pass on to the next 
+app.use(express.json());
+
 app.use('/api/places', placesRoutes);
+
+app.use((req, res, next) => {
+    const error = new HttpError('Are you lost? How did you get here :O', 404);
+    throw error;
+})
 
 // Error handling middleware
 app.use((error, req, res, next) => {
