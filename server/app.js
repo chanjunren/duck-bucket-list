@@ -2,6 +2,7 @@ const express = require('express');
 const bodyParser = require('body-parser');
 
 const placesRoutes = require('./routes/places_routes');
+const userRoutes = require('./routes/users_routes');
 const HttpError = require('./models/http_error');
 
 const app = express();
@@ -10,6 +11,8 @@ const app = express();
 app.use(express.json());
 
 app.use('/api/places', placesRoutes);
+
+app.use('/api/users', userRoutes);
 
 app.use((req, res, next) => {
     const error = new HttpError('Are you lost? How did you get here :O', 404);
