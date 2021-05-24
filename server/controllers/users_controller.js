@@ -1,5 +1,6 @@
 const uuid = require('uuid');
 const util = require('util');
+const {validationResult} = require('express-validator');
 
 const HttpError = require('../models/http_error');
 
@@ -28,7 +29,13 @@ const getAllUsers = (req, res, next) => {
 };
 
 const registerUser = (req, res, next) => {
-    const {email, password, role} = req.body;
+    const {email, password, name} = req.body;
+
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        console.log(util.inspect(errors, false ,null, true));
+        return next(new HttpError('Invalid inputs passed D:', 422));
+    }
 
     const existingEmail = DUMMY_USERS.find(user => user.email === email);
     
@@ -38,9 +45,9 @@ const registerUser = (req, res, next) => {
 
     const newUser = {
         id: uuid.v4(),
+        name: name,
         email: email,
         password: password,
-        role: role
     };
 
     DUMMY_USERS.push(newUser);

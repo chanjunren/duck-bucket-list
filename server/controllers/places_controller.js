@@ -1,5 +1,6 @@
 const uuid = require("uuid");
-const util = require('util')
+const util = require('util');
+const {validationResult} = require('express-validator');
 
 const HttpError = require("../models/http_error");
 
@@ -58,6 +59,12 @@ const getUserPlacesByUid = (req, res, next) => {
 };
 
 const createPlace = (req, res, next) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    console.log(util.inspect(errors, false ,null, true));
+    return next(new HttpError('Invalid inputs passed D:', 422));
+  }
+
   const { title, description, coordinates, address, creator } = req.body;
   console.log("Received: " + JSON.stringify(req.body));
   const createdPlace = {
@@ -115,6 +122,10 @@ const updatePlaceById = (req, res, next) => {
 
 const deletePlaceById = (req, res, next) => {
   const placeId = req.params.placeId;
+  if (!DUMMY_PLACES.find(p => p.id == placeId)) {
+    return next(new HttpError("The place you are trying to delete does not exist! D:", 404));
+  }
+
   DUMMY_PLACES = DUMMY_PLACES.filter(p => p.id != placeId);
 
   res.status(200).json({"Bye bye": DUMMY_PLACES});
