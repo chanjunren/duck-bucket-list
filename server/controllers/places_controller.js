@@ -1,8 +1,9 @@
 const uuid = require("uuid");
 const util = require('util');
-const {validationResult} = require('express-validator');
+const { validationResult } = require('express-validator');
 
 const HttpError = require("../models/http_error");
+const getCoordinatesFromAddress = require("../util/location");
 
 var DUMMY_PLACES = [
   {
@@ -58,32 +59,36 @@ const getUserPlacesByUid = (req, res, next) => {
   res.json({ user_places: userPlaces });
 };
 
-const createPlace = (req, res, next) => {
+const createPlace = async (req, res, next) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
-    console.log(util.inspect(errors, false ,null, true));
+    console.log(util.inspect(errors, false, null, true));
     return next(new HttpError('Invalid inputs passed D:', 422));
   }
-
   const { title, description, coordinates, address, creator } = req.body;
-  console.log("Received: " + JSON.stringify(req.body));
-  const createdPlace = {
-    id: uuid.v4(),
-    title,
-    description,
-    location: coordinates,
-    address,
-    creator,
-  };
+  try {
+    const coordinates = await getCoordinatesFromAddress(address);
+    console.log("Received: " + JSON.stringify(req.body));
+    const createdPlace = {
+      id: uuid.v4(),
+      title,
+      description,
+      location: coordinates,
+      address,
+      creator,
+    };
 
-  DUMMY_PLACES.push(createdPlace);
-  console.log("Updated: === DUMMY_PLACES: ===\n" + JSON.stringify(DUMMY_PLACES));
-  res.status(201).json({ place: createdPlace });
+    DUMMY_PLACES.push(createdPlace);
+    console.log("Updated: === DUMMY_PLACES: ===\n" + JSON.stringify(DUMMY_PLACES));
+    res.status(201).json({ place: createdPlace });
+  } catch (error) {
+    return next(error);
+  }
 };
 
 const updatePlaceById = (req, res, next) => {
   const placeId = req.params.placeId;
-  const placeSpecified = {...DUMMY_PLACES.find((place) => place.id === placeId)};
+  const placeSpecified = { ...DUMMY_PLACES.find((place) => place.id === placeId) };
   const placeIndex = DUMMY_PLACES.findIndex(place => place.id === placeId);
 
   if (!placeSpecified) {
@@ -117,7 +122,7 @@ const updatePlaceById = (req, res, next) => {
 
   }
 
-  res.status(200).json({place: placeSpecified});
+  res.status(200).json({ place: placeSpecified });
 };
 
 const deletePlaceById = (req, res, next) => {
@@ -128,7 +133,7 @@ const deletePlaceById = (req, res, next) => {
 
   DUMMY_PLACES = DUMMY_PLACES.filter(p => p.id != placeId);
 
-  res.status(200).json({"Bye bye": DUMMY_PLACES});
+  res.status(200).json({ "Bye bye": DUMMY_PLACES });
 };
 
 exports.getPlaceById = getPlaceById;
