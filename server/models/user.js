@@ -7,7 +7,7 @@ const userSchema = new mongoose.Schema({
     email: {type: String, required: true, unique: true},
     password: {type: String, required: true},
     imageUrl: {type: String, required: true},
-    places: {type: String, required: false}
+    places: [{ type: mongoose.Types.ObjectId, required: true, ref: 'Place' }]
 });
 
 userSchema.plugin(uniqueValidator);

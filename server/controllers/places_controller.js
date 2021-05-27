@@ -1,41 +1,11 @@
 const util = require('util');
 const { validationResult } = require('express-validator');
+const mongoose = require('mongoose');
 
 const HttpError = require("../models/http_error");
 const getCoordinatesFromAddress = require("../util/location");
 const Place = require('../models/place');
-
-var DUMMY_PLACES = [
-  {
-    id: "p1",
-    title: "Himalayans",
-    description:
-      "Legendary mountain range featuring numerous towering peaks, including Mount Everest!",
-    imageUrl:
-      "https://deih43ym53wif.cloudfront.net/everest-base-camp-himalayas-nepal_08bc81b2f2.jpeg",
-    address:
-      "Mountain Range (India, Pakistan, Afghanistan, China, Bhutan and Nepal)",
-    location: {
-      lat: 30.0925684,
-      lng: 76.5389941,
-    },
-    creator: "u1",
-  },
-  {
-    id: "p2",
-    title: "The Lofoten Islands",
-    description:
-      "Lofoten is known for excellent fishing, nature attractions such as the northern lights and the midnight sun, and small villages off the beaten track",
-    imageUrl:
-      "https://img.traveltriangle.com/blog/wp-content/uploads/2018/11/lofoten1.jpg",
-    address: "8314 Gimsøysand, Norway",
-    location: {
-      lat: 68.4716466,
-      lng: 13.8568658,
-    },
-    creator: "u1",
-  },
-];
+const User = require('../models/user');
 
 const getPlaceById = async (req, res, next) => {
   const placeId = req.params.placeId;
@@ -52,13 +22,15 @@ const getPlaceById = async (req, res, next) => {
 const getUserPlacesByUid = async (req, res, next) => {
   const uid = req.params.userId;
   try {
-    const userPlaces = await Place.find({ creator: uid });
-    if (userPlaces.length === 0) {
+    const userWithPlaces = await User.findById(uid).populate('places');
+    // console.log("User found: " + JSON.stringify(userWithPlaces));
+    // console.log("Places length: " + userWithPlaces.places.length);
+    if (!userWithPlaces || userWithPlaces.places.length === 0) {
       return next(
         new HttpError("This dude got nothing on his bucket list! :(", 404)
       ); // either next() or throw() | next() for async code
     }
-    res.json({ user_places: userPlaces.map(place => place.toObject({ getters: true })) });
+    res.json({ user_places: userWithPlaces.places.map(place => place.toObject({ getters: true })) });
   } catch (err) {
     return next(
       new HttpError("This dude is not found in our database D:", 404)
@@ -83,6 +55,16 @@ const createPlace = async (req, res, next) => {
     return next(error);
   }
 
+  let user;
+  try {
+    user = await User.findById(creator);
+  } catch (err) {
+    return next(new HttpError("An error occured while looking for the associated creator! D:", 500));
+  }
+  if (!user) {
+    return next(new HttpError("The associated creator could not be found! D:", 404));
+  }
+
   const newPlace = new Place({
     title: title,
     description: description,
@@ -93,12 +75,16 @@ const createPlace = async (req, res, next) => {
   });
 
   try {
-    newPlace.save().then(() => {
-      console.log("Created new place successfully!");
-      res.status(201).json({ place: newPlace });
-    });
-  } catch (error) {
-    return next(error);
+    const session = await mongoose.startSession();
+    session.startTransaction();
+    await newPlace.save({session: session});
+    await user.places.push(newPlace);
+    await user.save({session: session});
+    await session.commitTransaction();
+    res.status(201).json({"Created place": newPlace.toObject({getters: true})});
+  } catch (err) {
+    console.error(err);
+    return next(new HttpError("An error occured while trying to save this place! D:", 500));
   }
 };
 
@@ -140,11 +126,30 @@ const updatePlaceById = async (req, res, next) => {
 const deletePlaceById = async (req, res, next) => {
   const placeId = req.params.placeId;
   let place;
+
   try {
-    place = await Place.findById(placeId);
-    await place.remove();
-  } catch (err) {
+    place = await Place.findById(placeId).populate('creator');
+    console.log("Place found: " + JSON.stringify(place));
+  } catch (err) { 
+    return next(new HttpError("Something went wrong when looking for the place to be deleted! D:", 500));
+  }
+
+  if (!place) {
     return next(new HttpError("The place you are trying to delete could not be found! D:", 404));
+  }
+  
+  // Removing place from database and associated creator
+  try {
+    const session = await mongoose.startSession();
+    session.startTransaction();
+    await place.remove({session: session});
+
+    // place.creator returns the user object
+    place.creator.places.pull(place);
+    await place.creator.save({session: session});
+    await session.commitTransaction();
+  } catch (err) {
+    return next(new HttpError("Something went wrong when trying to delete this place! D:", 500));
   }
   res.status(200).json({ "This item has been deleted! :D": place });
 };

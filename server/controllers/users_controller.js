@@ -35,7 +35,8 @@ const registerUser = async (req, res, next) => {
         name: name,
         email: email,
         password: password,
-        imageUrl: imageUrl
+        imageUrl: imageUrl,
+        places: []
     });
 
     try {
