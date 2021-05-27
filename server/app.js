@@ -32,7 +32,8 @@ mongoose
     .connect(`mongodb+srv://itsmecjr:woainizhanghao@cluster0.ypgjz.mongodb.net/places?retryWrites=true&w=majority`,
         {
             useNewUrlParser: true,
-            useUnifiedTopology: true
+            useUnifiedTopology: true,
+            useCreateIndex: true
         })
     .then(() => {
         app.listen(5000);

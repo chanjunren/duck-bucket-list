@@ -1,75 +1,70 @@
-const uuid = require('uuid');
 const util = require('util');
-const {validationResult} = require('express-validator');
+const { validationResult } = require('express-validator');
 
+const User = require('../models/user');
 const HttpError = require('../models/http_error');
 
-var DUMMY_USERS = [
-    {
-        id: 'userId1',
-        email: 'ongbengchia@gmail.com',
-        password: 'hello123',
-        role: 'administrator'
-    },
-    {
-        id: 'userId2',
-        email: 'kaisocool@gmail.com',
-        password: 'kaivomit',
-        role: 'dumb'
+const getAllUsers = async (req, res, next) => {
+    let users;
+    try {
+        users = await User.find({}, '-password');
+    } catch (err) {
+        return next(new HttpError('Something went wrong when trying to get all users! :(', 500));
     }
-];
 
-const getAllUsers = (req, res, next) => {
-    if (DUMMY_USERS.length === 0) {
-        return next(new HttpError('There are no registered users! :(', 404));
-    }
     console.log("=== ALL USERS === ");
-    console.log(util.inspect(DUMMY_USERS, false, null, true));
-    res.status(200).json({'users': DUMMY_USERS});
+    console.log(util.inspect(users, false, null, true));
+    res.status(200).json({ 'users': users.map(user => user.toObject({ getters: true })) });
 };
 
-const registerUser = (req, res, next) => {
-    const {email, password, name} = req.body;
+const registerUser = async (req, res, next) => {
+    const { email, password, name, imageUrl } = req.body;
 
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-        console.log(util.inspect(errors, false ,null, true));
+        console.log(util.inspect(errors, false, null, true));
         return next(new HttpError('Invalid inputs passed D:', 422));
     }
 
-    const existingEmail = DUMMY_USERS.find(user => user.email === email);
-    
+    const existingEmail = await User.findOne({ email: email });
     if (existingEmail) {
         return next(new HttpError('A user with this email already exists! D:', 409));
     }
 
-    const newUser = {
-        id: uuid.v4(),
+    const newUser = new User({
         name: name,
         email: email,
         password: password,
-    };
+        imageUrl: imageUrl
+    });
 
-    DUMMY_USERS.push(newUser);
-
-    console.log(" === USER SUCCESFULLY ADDED ===");
-    console.log(util.inspect(DUMMY_USERS, false, null, true));
-    
-    res.status(201).json({"New User": newUser});
+    try {
+        console.log(" === USER SUCCESFULLY ADDED ===");
+        await newUser.save();
+        res.status(201).json({ "New User": newUser.toObject({ getters: true }) });
+    } catch (err) {
+        return next(new HttpError('Something went wrong when trying to create this user! D:', 500));
+    }
 };
 
-const loginUser = (req, res, next) => {
-    const {email, password} = req.body;
-    const user = DUMMY_USERS.find(user => user.email === email);
-    if (!user) {
-        return next(new HttpError("Invalid email! D:", 401));
+const loginUser = async (req, res, next) => {
+    const { email, password } = req.body;
+
+    let user;
+    try {
+        user = await User.findOne({ email: email });
+        if (!user) {
+            return next(new HttpError("There is no account with this email! D:", 401));
+        }
+    } catch (err) {
+        return next(new HttpError("Something went wrong when trying to get this email! D:", 500));
     }
 
     if (user.password != password) {
         return next(new HttpError("Incorrect password! D:", 401));
     }
 
-    res.status(200).json({messsage: "successfully logged in! :D"});
+    res.status(200).json({ messsage: "successfully logged in! :D" });
 };
 
 
