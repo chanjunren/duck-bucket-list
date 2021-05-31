@@ -29,7 +29,7 @@ app.use((error, req, res, next) => {
 })
 
 mongoose
-    .connect(`mongodb+srv://itsmecjr:woainizhanghao@cluster0.ypgjz.mongodb.net/places?retryWrites=true&w=majority`,
+    .connect(`mongodb+srv://itsmecjr:woainizhanghao@cluster0.ypgjz.mongodb.net/duck-bucket-list?retryWrites=true&w=majority`,
         {
             useNewUrlParser: true,
             useUnifiedTopology: true,
