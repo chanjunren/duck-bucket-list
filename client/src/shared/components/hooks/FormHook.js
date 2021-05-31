@@ -7,9 +7,9 @@ const formReducer = (state, action) => {
     switch (action.type) {
       case `${INPUT_ACTION}`:
         let formIsValid = true;
-        console.log("STATE IN HOOK: " + JSON.stringify(state));
+        // console.log("STATE IN HOOK: " + JSON.stringify(state));
         for (const inputId in state.inputs) {
-          console.log(`Input ID: ${inputId} | Value: ${JSON.stringify(state.inputs[inputId])}`);
+          // console.log(`Input ID: ${inputId} | Value: ${JSON.stringify(state.inputs[inputId])}`);
           if (!state.inputs[inputId]) {
             continue;
           }

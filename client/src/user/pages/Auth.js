@@ -22,7 +22,7 @@ const Auth = props => {
             setFormData({
                 ...formState.inputs,
                 nameInput: undefined
-                
+
             }, formState.inputs.emailInput.isValid && formState.inputs.passwordInput.isValid);
         } else {
             setFormData({
@@ -34,71 +34,105 @@ const Auth = props => {
             }, false);
         };
 
-        console.log("Form Data: "  + JSON.stringify(formState));
-        
-        
+        console.log("Form Data: " + JSON.stringify(formState));
+
+
         toggleLoginMode(currentMode => !currentMode);
     }
 
-    const onLoginHandler = event => {
+    const onLoginHandler = async event => {
         event.preventDefault();
-        console.log("Login Email: " + formState.inputs.emailInput.value);
-        console.log("Login Password: " + formState.inputs.passwordInput.value);        
+        try {
+            const response = await fetch('http://localhost:5000/api/users/login', {
+                method: 'POST',
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    email: formState.inputs.emailInput.value,
+                    password: formState.inputs.passwordInput.value
+                })
+            });
+            const responseData = await response.json();
+            console.log(responseData);
+        } catch (err) {  // Thrown if the request cannot be sent
+            console.error(err);
+        }
+        
         authContext.login();
     }
 
-    const onSignUpHandler = event => {
+    const onSignUpHandler = async event => {
         event.preventDefault();
         console.log("SIGN UP: " + formState.inputs);
+        event.preventDefault();
+        try {
+            const response = await fetch('http://localhost:5000/api/users/signup', {
+                method: 'POST',
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    name: formState.inputs.nameInput.value,
+                    email: formState.inputs.emailInput.value,
+                    password: formState.inputs.passwordInput.value,
+                    imageUrl: "https://www.pinclipart.com/picdir/middle/531-5312019_kawaii-clipart-duck-picture-kawaii-cute-duck-cartoon.png"
+                })
+            });
+            const responseData = await response.json();
+            console.log(responseData);
+        } catch (err) {  // Thrown if the request cannot be sent
+            console.error(err);
+        }
     }
 
     return (
         <Card className="authentication">
             <h2>{isLoginMode ? "Hello!" : "Welcome >:D"}</h2>
-            <hr/>
+            <hr />
             <form>
-            {!isLoginMode && <Input
-                id="nameInput"
-                element="input"
-                validators={[VALIDATOR_REQUIRE()]}
-                type="text"
-                label="Name"
-                onInput={inputHandler}
-                errorText="Please enter a valid name"
-            />}
-            <Input
-                id="emailInput"
-                element="input"
-                validators={[VALIDATOR_EMAIL()]}
-                type="email"
-                label="Email"
-                onInput={inputHandler}
-                errorText="Please enter a valid email"
-            />
-            <Input
-                id="passwordInput"
-                element="input"
-                validators={[VALIDATOR_MINLENGTH(5)]}
-                type="text"
-                label="Password"
-                onInput={inputHandler}
-                errorText="Please enter a valid password"
-            />
-            <Button 
-                inverse
-                type="Submit"
-                disabled={!formState.isValid}
-                onClick={isLoginMode ? onLoginHandler: onSignUpHandler}
-            >{isLoginMode ? "Log In" : "Sign Up"}</Button>
-        </form>
+                {!isLoginMode && <Input
+                    id="nameInput"
+                    element="input"
+                    validators={[VALIDATOR_REQUIRE()]}
+                    type="text"
+                    label="Name"
+                    onInput={inputHandler}
+                    errorText="Please enter a valid name"
+                />}
+                <Input
+                    id="emailInput"
+                    element="input"
+                    validators={[VALIDATOR_EMAIL()]}
+                    type="email"
+                    label="Email"
+                    onInput={inputHandler}
+                    errorText="Please enter a valid email"
+                />
+                <Input
+                    id="passwordInput"
+                    element="input"
+                    validators={[VALIDATOR_MINLENGTH(5)]}
+                    type="text"
+                    label="Password"
+                    onInput={inputHandler}
+                    errorText="Please enter a valid password"
+                />
+                <Button
+                    inverse
+                    type="Submit"
+                    disabled={!formState.isValid}
+                    onClick={isLoginMode ? onLoginHandler : onSignUpHandler}
+                >{isLoginMode ? "Log In" : "Sign Up"}</Button>
+            </form>
 
-        <Button 
+            <Button
                 inverse
                 // type="Submit"
                 onClick={switchButtonHandler}
             >Switch to {isLoginMode ? "Sign Up" : "Log in"}</Button>
         </Card>
-        
+
     )
 };
 
