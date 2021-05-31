@@ -9,11 +9,15 @@ import './Auth.css'
 import { AuthContext } from '../../shared/components/context/AuthContext';
 import { VALIDATOR_EMAIL, VALIDATOR_MINLENGTH, VALIDATOR_REQUIRE } from '../../shared/util/FormValidators';
 import { useForm } from '../../shared/components/hooks/FormHook';
+import LoadingSpinner from '../../shared/components/uiElements/LoadingSpinner';
 
 const Auth = props => {
     const [formState, inputHandler, setFormData] = useForm({}, false);
 
     const [isLoginMode, toggleLoginMode] = useState(true);
+
+    const [isLoading, setIsLoading] = useState(false);
+    const [errorEncountered, setErrorEncountered] = useState();
 
     const authContext = useContext(AuthContext);
 
@@ -43,6 +47,7 @@ const Auth = props => {
     const onLoginHandler = async event => {
         event.preventDefault();
         try {
+            setIsLoading(true);
             const response = await fetch('http://localhost:5000/api/users/login', {
                 method: 'POST',
                 headers: {
@@ -55,11 +60,13 @@ const Auth = props => {
             });
             const responseData = await response.json();
             console.log(responseData);
+            setIsLoading(false);
+            authContext.login();
         } catch (err) {  // Thrown if the request cannot be sent
             console.error(err);
+            setIsLoading(false);
+            setErrorEncountered(err.message || 'Where did the err.message go D:');
         }
-        
-        authContext.login();
     }
 
     const onSignUpHandler = async event => {
@@ -88,6 +95,7 @@ const Auth = props => {
 
     return (
         <Card className="authentication">
+            {isLoading && <LoadingSpinner asOverlay/>}
             <h2>{isLoginMode ? "Hello!" : "Welcome >:D"}</h2>
             <hr />
             <form>
