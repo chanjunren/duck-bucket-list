@@ -5,6 +5,7 @@ import Card from '../../shared/components/uiElements/Card';
 import './UsersList.css';
 
 const UsersList = props => {
+  console.log(JSON.stringify(props.items));
   if (props.items.length === 0) {
     return (
       <div className="center">
@@ -21,9 +22,9 @@ const UsersList = props => {
         <UserItem
           key={user.id}
           id={user.id}
-          image={user.image}
+          image={user.imageUrl}
           name={user.name}
-          placeCount={user.places}
+          placeCount={user.places.length}
         />
       ))}
     </ul>

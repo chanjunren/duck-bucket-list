@@ -11,14 +11,14 @@ import { AuthContext } from '../../shared/components/context/AuthContext';
 import { VALIDATOR_EMAIL, VALIDATOR_MINLENGTH, VALIDATOR_REQUIRE } from '../../shared/util/FormValidators';
 import { useForm } from '../../shared/components/hooks/FormHook';
 import LoadingSpinner from '../../shared/components/uiElements/LoadingSpinner';
+import useHttpClient from '../../shared/components/hooks/HttpHook';
 
 const Auth = props => {
     const [formState, inputHandler, setFormData] = useForm({}, false);
 
     const [isLoginMode, toggleLoginMode] = useState(true);
 
-    const [isLoading, setIsLoading] = useState(false);
-    const [errorEncountered, setErrorEncountered] = useState();
+    const { isLoading, errorEncountered, sendRequest, clearError } = useHttpClient();
 
     const authContext = useContext(AuthContext);
 
@@ -48,72 +48,45 @@ const Auth = props => {
     const onLoginHandler = async event => {
         event.preventDefault();
         try {
-            setIsLoading(true);
-            const response = await fetch('http://localhost:5000/api/users/login', {
-                method: 'POST',
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify({
+            const responseData = await sendRequest('http://localhost:5000/api/users/login',
+                'POST',
+                JSON.stringify({
                     email: formState.inputs.emailInput.value,
                     password: formState.inputs.passwordInput.value
-                })
-            });
-            const responseData = await response.json();
-            console.log(responseData);
-            if (!response.ok) {
-                throw new Error(responseData.message);
-            }
-            setIsLoading(false);
+                }),
+                {
+                    "Content-Type": "application/json"
+                }
+            );
+
             authContext.login();
-        } catch (err) {  // Thrown if the request cannot be sent
-            console.error(err);
-            setIsLoading(false);
-            setErrorEncountered(err.message || 'Where did the err.message go D:');
-        }
+        } catch (err) { }
     }
 
     const onSignUpHandler = async event => {
         event.preventDefault();
-        console.log("SIGN UP: " + formState.inputs);
-        setIsLoading(true);
         try {
-            const response = await fetch('http://localhost:5000/api/users/signup', {
-                method: 'POST',
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify({
+            const responseData = await sendRequest('http://localhost:5000/api/users/signup',
+                'POST',
+                JSON.stringify({
                     name: formState.inputs.nameInput.value,
                     email: formState.inputs.emailInput.value,
                     password: formState.inputs.passwordInput.value,
                     imageUrl: "https://www.pinclipart.com/picdir/middle/531-5312019_kawaii-clipart-duck-picture-kawaii-cute-duck-cartoon.png"
-                })
-            });
-            const responseData = await response.json();
-            if (!response.ok) {
-                throw new Error(responseData.message);
-            }
-            console.log(responseData);
-
-            setIsLoading(false);
+                }),
+                {
+                    "Content-Type": "application/json"
+                }
+            );
+            console.log("Signup Response Data: " + JSON.stringify(responseData));
             authContext.login();
-            
-        } catch (err) {  // Thrown if the request cannot be sent
-            console.error(err);
-            setIsLoading(false);
-            setErrorEncountered(err.message || 'Where did the err.message go D:');
-        }
-    }
-
-    const ErrorModalHandler = event => {
-        setErrorEncountered(null);
+        } catch (err) { }
     }
 
     return (
         <React.Fragment>
             <ErrorModal
-                onClear={ErrorModalHandler}
+                onClear={clearError}
                 errorMessage={errorEncountered}
             />
             <Card className="authentication">
@@ -143,7 +116,7 @@ const Auth = props => {
                         id="passwordInput"
                         element="input"
                         validators={[VALIDATOR_MINLENGTH(5)]}
-                        type="text"
+                        type="password"
                         label="Password"
                         onInput={inputHandler}
                         errorText="Please enter a valid password"
