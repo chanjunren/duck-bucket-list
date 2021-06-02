@@ -60,7 +60,7 @@ const createPlace = async (req, res, next) => {
     user = await User.findById(creator);
   } catch (err) {
     return next(new HttpError("An error occured while looking for the associated creator! D:", 500));
-  }
+  }h
   if (!user) {
     return next(new HttpError("The associated creator could not be found! D:", 404));
   }
@@ -101,11 +101,10 @@ const updatePlaceById = async (req, res, next) => {
   }
 
   for (var key in newValues) {
-    if (!placeSpecified[key] || key === 'address' || key === 'location') {
+    if (!placeSpecified[key]) {
       return next(
         new HttpError(
           `Invalid key in update request`, 500,
-
         )
       );
     }
@@ -113,6 +112,16 @@ const updatePlaceById = async (req, res, next) => {
 
   for (var key in newValues) {
     placeSpecified[key] = newValues[key];
+    if (key == 'address') {
+      let coordinates;
+      try {
+        coordinates = await getCoordinatesFromAddress(newValues[key]);
+        console.log("Received coordinates: " + JSON.stringify(coordinates));
+      } catch (error) {
+        return next(error);
+      }    
+      placeSpecified.location = coordinates;
+    }
   }
 
   try {
