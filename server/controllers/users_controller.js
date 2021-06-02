@@ -42,7 +42,8 @@ const registerUser = async (req, res, next) => {
     try {
         console.log(" === USER SUCCESFULLY ADDED ===");
         await newUser.save();
-        res.status(201).json({ "New User": newUser.toObject({ getters: true }) });
+        console.log(newUser.toObject({ getters: true }));
+        res.status(201).json({ "id": newUser._id });
     } catch (err) {
         return next(new HttpError('Something went wrong when trying to create this user! D:', 500));
     }
@@ -65,7 +66,7 @@ const loginUser = async (req, res, next) => {
         return next(new HttpError("Incorrect password! D:", 401));
     }
 
-    res.status(200).json({ messsage: "successfully logged in! :D" });
+    res.status(200).json({ messsage: "successfully logged in! :D", id: user._id });
 };
 
 

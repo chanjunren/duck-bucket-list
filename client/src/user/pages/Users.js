@@ -12,14 +12,14 @@ const Users = props => {
   const [loadedUsers, setLoadedUsers] = useState([]);
 
   useEffect(() => {
-    const initializePage = async () => {
+    const fetchUsers = async () => {
       try {
         const responseData = await sendRequest("http://localhost:5000/api/users");
         setLoadedUsers(responseData.users);
   
       } catch (err) { }
     }
-    initializePage();
+    fetchUsers();
   
   }, [sendRequest]);
 
