@@ -60,7 +60,7 @@ const createPlace = async (req, res, next) => {
     user = await User.findById(creator);
   } catch (err) {
     return next(new HttpError("An error occured while looking for the associated creator! D:", 500));
-  }h
+  }
   if (!user) {
     return next(new HttpError("The associated creator could not be found! D:", 404));
   }
