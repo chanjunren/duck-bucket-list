@@ -5,6 +5,7 @@ import Input from '../../shared/components/formElements/Input';
 import Button from '../../shared/components/formElements/Button';
 import Card from '../../shared/components/uiElements/Card';
 import ErrorModal from '../../shared/components/uiElements/ErrorModal';
+import ImageUpload from '../../shared/components/formElements/ImageUpload';
 import './Auth.css';
 
 import { AuthContext } from '../../shared/components/context/AuthContext';
@@ -121,6 +122,7 @@ const Auth = props => {
                         onInput={inputHandler}
                         errorText="Please enter a valid password"
                     />
+                    {!isLoginMode && <ImageUpload center id="image"/>}
                     <Button
                         inverse
                         type="Submit"
