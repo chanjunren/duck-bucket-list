@@ -71,17 +71,15 @@ const Auth = props => {
     const onSignUpHandler = async event => {
         event.preventDefault();
         try {
+            const formData = new FormData();
+            formData.append('name', formState.inputs.nameInput.value);
+            formData.append('email', formState.inputs.emailInput.value);
+            formData.append('password', formState.inputs.passwordInput.value);
+            formData.append('imageUrl', formState.inputs.dpInput.value);
+
             const responseData = await sendRequest('http://localhost:5000/api/users/signup',
                 'POST',
-                JSON.stringify({
-                    name: formState.inputs.nameInput.value,
-                    email: formState.inputs.emailInput.value,
-                    password: formState.inputs.passwordInput.value,
-                    imageUrl: "https://www.pinclipart.com/picdir/middle/531-5312019_kawaii-clipart-duck-picture-kawaii-cute-duck-cartoon.png"
-                }),
-                {
-                    "Content-Type": "application/json"
-                }
+                formData
             );
             console.log("Signup Response Data: " + JSON.stringify(responseData));
             authContext.login(responseData.id);

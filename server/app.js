@@ -1,5 +1,7 @@
 const express = require('express');
 const mongoose = require('mongoose');
+const fs = require('fs');
+const path = require('path');
 
 const placesRoutes = require('./routes/places_routes');
 const userRoutes = require('./routes/users_routes');
@@ -10,9 +12,11 @@ const app = express();
 // Parse the body first and then pass on to the next
 app.use(express.json());
 
+app.use('/uploads/images', express.static(path.join('uploads', 'images')));
+
 app.use((req, res, next) => {
     res.setHeader('Access-Control-Allow-Origin', '*');
-    res.setHeader('Access-Control-Allow-Headers', 
+    res.setHeader('Access-Control-Allow-Headers',
         'Content-Type, Origin, X-Requested-With, Accept, Authorization');
     res.setHeader('Access-Control-Allow-Methods',
         'GET, POST, PATCH, DELETE');
@@ -30,6 +34,11 @@ app.use((req, res, next) => {
 
 // Error handling middleware
 app.use((error, req, res, next) => {
+    if (req.file) {
+        fs.unlink(req.file.path, error => {
+            console.log("ERror: " + error);
+        });
+    }
     if (res.headerSent) {
         return next(error);
     }

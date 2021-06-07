@@ -10,7 +10,7 @@ const router = express.Router();
 router.get('/', userController.getAllUsers);
 
 router.post('/signup',
-    fileUpload.single('image'),
+    fileUpload.single('imageUrl'),
     [check('email').normalizeEmail().isEmail(),
     check('name').notEmpty(),
     check('password').isLength({ min: 6 })],

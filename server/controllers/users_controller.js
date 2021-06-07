@@ -18,7 +18,7 @@ const getAllUsers = async (req, res, next) => {
 };
 
 const registerUser = async (req, res, next) => {
-    const { email, password, name, imageUrl } = req.body;
+    const { email, password, name } = req.body;
 
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -35,7 +35,7 @@ const registerUser = async (req, res, next) => {
         name: name,
         email: email,
         password: password,
-        imageUrl: imageUrl,
+        imageUrl: req.file.path,
         places: []
     });
 
