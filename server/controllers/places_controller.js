@@ -44,7 +44,7 @@ const createPlace = async (req, res, next) => {
     console.log(util.inspect(errors, false, null, true));
     return next(new HttpError('Invalid inputs passed D:', 422));
   }
-  const { title, description, imageUrl, address, creator } = req.body;
+  const { title, description, address, creator } = req.body;
 
   let coordinates;
 
@@ -68,7 +68,7 @@ const createPlace = async (req, res, next) => {
   const newPlace = new Place({
     title: title,
     description: description,
-    image: imageUrl,
+    image: req.file.path,
     address: address,
     location: coordinates,
     creator: creator

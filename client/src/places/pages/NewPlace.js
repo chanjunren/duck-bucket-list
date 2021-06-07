@@ -5,6 +5,7 @@ import Input from '../../shared/components/formElements/Input';
 import Button from '../../shared/components/formElements/Button';
 import LoadingSpinner from '../../shared/components/uiElements/LoadingSpinner';
 import ErrorModal from '../../shared/components/uiElements/ErrorModal';
+
 import { AuthContext } from '../../shared/components/context/AuthContext';
 
 import { VALIDATOR_MINLENGTH, VALIDATOR_REQUIRE } from '../../shared/util/FormValidators';
@@ -12,6 +13,7 @@ import { VALIDATOR_MINLENGTH, VALIDATOR_REQUIRE } from '../../shared/util/FormVa
 import './NewPlace.css'
 import { useForm } from '../../shared/components/hooks/FormHook';
 import useHttpClient from '../../shared/components/hooks/HttpHook';
+import ImageUpload from '../../shared/components/formElements/ImageUpload';
 
 
 const initialInputs = {
@@ -39,20 +41,19 @@ const NewPlace = () => {
   const submitNewPlaceHandler = async event => {
     event.preventDefault();
     try {
+      console.log('sending: ' + formState.inputs.placePreviewInput.value);
+      const formData = new FormData();
+      formData.append('title', formState.inputs.titleInput.value);
+      formData.append('description', formState.inputs.descriptionInput.value);
+      formData.append('image', formState.inputs.placePreviewInput.value);
+      formData.append('address', formState.inputs.addressInput.value);
+      formData.append('creator', context.userId);
+
       await sendRequest("http://localhost:5000/api/places",
         "POST",
-        JSON.stringify({
-          title: formState.inputs.titleInput.value,
-          description: formState.inputs.descriptionInput.value,
-          imageUrl: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTBHQELPLQtchYmae9xi5Y-85eEIPeV1nvm2w&usqp=CAU",
-          address: formState.inputs.addressInput.value,
-          creator: context.userId,
-        }),
-        {
-          "Content-Type": "application/json"
-        });
+        formData);
 
-        history.push('/');
+      history.push('/');
 
     } catch (error) {
       console.error("CAUGHT: " + error);
@@ -61,9 +62,9 @@ const NewPlace = () => {
   };
 
   return <React.Fragment>
-    {errorEncountered && <ErrorModal errorMessage={errorEncountered} onClear={clearError}/>}
+    {errorEncountered && <ErrorModal errorMessage={errorEncountered} onClear={clearError} />}
     <form className="place-form">
-      {isLoading && <LoadingSpinner asOverlay/>}
+      {isLoading && <LoadingSpinner asOverlay />}
       <Input
         id="titleInput"
         element="input"
@@ -72,6 +73,12 @@ const NewPlace = () => {
         label="Title"
         validators={[VALIDATOR_REQUIRE()]}
         errorText="Please enter a valid title" />
+      <ImageUpload 
+        id="placePreviewInput"
+        initialMsg="Picture of place"
+        onInput={inputHandler}
+        center
+      />
       <Input
         id="descriptionInput"
         element="textarea"
