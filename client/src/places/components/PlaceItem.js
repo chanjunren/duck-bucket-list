@@ -14,12 +14,12 @@ import LoadingSpinner from '../../shared/components/uiElements/LoadingSpinner';
 
 // KEY | ID | IMAGEURL | TITLE | DESCRIPTION | ADDRESS | CREATOR ID | COORDINATES
 const PlaceItem = props => {
-  const authContext = useContext(AuthContext);
+  const context = useContext(AuthContext);
   const { isLoading, errorEncountered, sendRequest, clearError } = useHttpClient();
   const [isMapModalVisible, toggleMapModal] = useState(false);
   const mapModalEventHandler = () => {
-      console.log("Handler triggered: " + isMapModalVisible);
-      toggleMapModal(!isMapModalVisible);
+    console.log("Handler triggered: " + isMapModalVisible);
+    toggleMapModal(!isMapModalVisible);
   }
 
   const [isDeleteModalVisible, toggleDeleteModal] = useState(false);
@@ -30,7 +30,12 @@ const PlaceItem = props => {
   const deleteEventHandler = async () => {
     console.log("DELETE EVENT CALLED");
     try {
-      await sendRequest(`http://localhost:5000/api/places/${props.id}`, 'DELETE');
+      await sendRequest(`http://localhost:5000/api/places/${props.id}`,
+        'DELETE',
+        null,
+        {
+          "Authorization": `Bearer ${context.token}`
+        });
       props.onDelete(props.id);
     } catch (err) {
       console.error("Caught error in deleteEventHandler: " + err);
@@ -40,8 +45,8 @@ const PlaceItem = props => {
 
   return (
     <React.Fragment>
-      {isLoading && <LoadingSpinner asOverlay/>}
-      <ErrorModal onClear={clearError} errorMessage={errorEncountered}/>
+      {isLoading && <LoadingSpinner asOverlay />}
+      <ErrorModal onClear={clearError} errorMessage={errorEncountered} />
       <Modal
         show={isMapModalVisible}
         onCancel={mapModalEventHandler}
@@ -55,7 +60,7 @@ const PlaceItem = props => {
         </div>
       </Modal>
       <Modal
-        header="Are you sure?" 
+        header="Are you sure?"
         show={isDeleteModalVisible}
         onCancel={deleteModalEventHandler}
         footerClass="place-item__modal-actions"
@@ -65,7 +70,7 @@ const PlaceItem = props => {
             <Button danger onClick={deleteEventHandler}>DELETE</Button>
           </React.Fragment>
         }>
-          <p>Are you sure you want to remove this? D:</p>
+        <p>Are you sure you want to remove this? D:</p>
       </Modal>
       <li className="place-item">
         <Card className="place-item__content">
@@ -79,8 +84,8 @@ const PlaceItem = props => {
           </div>
           <div className="place-item__actions">
             <Button inverse onClick={mapModalEventHandler}>VIEW ON MAP</Button>
-            {authContext.isLoggedIn && (props.creatorId === authContext.userId) && <Button to={`/places/${props.id}`}>EDIT</Button>}
-            {authContext.isLoggedIn && (props.creatorId === authContext.userId) && <Button danger onClick={deleteModalEventHandler}>DELETE</Button>}
+            {context.isLoggedIn && (props.creatorId === context.userId) && <Button to={`/places/${props.id}`}>EDIT</Button>}
+            {context.isLoggedIn && (props.creatorId === context.userId) && <Button danger onClick={deleteModalEventHandler}>DELETE</Button>}
           </div>
         </Card>
       </li>
