@@ -77,11 +77,11 @@ const createPlace = async (req, res, next) => {
   try {
     const session = await mongoose.startSession();
     session.startTransaction();
-    await newPlace.save({session: session});
+    await newPlace.save({ session: session });
     await user.places.push(newPlace);
-    await user.save({session: session});
+    await user.save({ session: session });
     await session.commitTransaction();
-    res.status(201).json({"Created place": newPlace.toObject({getters: true})});
+    res.status(201).json({ "Created place": newPlace.toObject({ getters: true }) });
   } catch (err) {
     console.error(err);
     return next(new HttpError("An error occured while trying to save this place! D:", 500));
@@ -98,6 +98,13 @@ const updatePlaceById = async (req, res, next) => {
     placeSpecified = await Place.findById(placeId);
   } catch (err) {
     return next(new HttpError('Place to be updated could not be found! D:', 404));
+  }
+
+  console.log(`user id in req.userData: ${req.userData.userId}`);
+  console.log(`user id in creator: ${placeSpecified.creator}`);
+
+  if (req.userData.userId != placeSpecified.creator) {
+    return next(new HttpError('You are not authorized to update this place! D:', 401));
   }
 
   for (var key in newValues) {
@@ -119,7 +126,7 @@ const updatePlaceById = async (req, res, next) => {
         console.log("Received coordinates: " + JSON.stringify(coordinates));
       } catch (error) {
         return next(error);
-      }    
+      }
       placeSpecified.location = coordinates;
     }
   }
@@ -139,23 +146,28 @@ const deletePlaceById = async (req, res, next) => {
   try {
     place = await Place.findById(placeId).populate('creator');
     console.log("Place found: " + JSON.stringify(place));
-  } catch (err) { 
+  } catch (err) {
     return next(new HttpError("Something went wrong when looking for the place to be deleted! D:", 500));
   }
 
   if (!place) {
     return next(new HttpError("The place you are trying to delete could not be found! D:", 404));
   }
-  
+
+  if (req.userData.userId != place.creator.id) {
+    return next(new HttpError('You are not authorized to delete this place! D:', 401));
+  }
+
+
   // Removing place from database and associated creator
   try {
     const session = await mongoose.startSession();
     session.startTransaction();
-    await place.remove({session: session});
+    await place.remove({ session: session });
 
     // place.creator returns the user object
     place.creator.places.pull(place);
-    await place.creator.save({session: session});
+    await place.creator.save({ session: session });
     await session.commitTransaction();
   } catch (err) {
     return next(new HttpError("Something went wrong when trying to delete this place! D:", 500));

@@ -35,6 +35,7 @@ const useHttpClient = () => {
 
     const clearError = () => {
         setErrorEncountered(null);
+        setIsLoading(false);
     }
 
     useEffect(() => {
