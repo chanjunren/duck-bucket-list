@@ -64,7 +64,7 @@ const Auth = props => {
                 }
             );
 
-            authContext.login(responseData.id);
+            authContext.login(responseData.userId, responseData.token);
         } catch (err) { }
     }
 
@@ -82,7 +82,7 @@ const Auth = props => {
                 formData
             );
             console.log("Signup Response Data: " + JSON.stringify(responseData));
-            authContext.login(responseData.id);
+            authContext.login(responseData.userId);
         } catch (err) { }
     }
 

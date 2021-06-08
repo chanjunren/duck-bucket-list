@@ -1,4 +1,6 @@
 const util = require('util');
+const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
 const { validationResult } = require('express-validator');
 
 const User = require('../models/user');
@@ -31,10 +33,17 @@ const registerUser = async (req, res, next) => {
         return next(new HttpError('A user with this email already exists! D:', 409));
     }
 
+    let hashedPw;
+    try {
+        hashedPw = await bcrypt.hash(password, 12);
+    } catch (err) {
+        return next(new HttpError('An error occured while attempting to hash the password! D:', 401));
+    }
+
     const newUser = new User({
         name: name,
         email: email,
-        password: password,
+        password: hashedPw,
         imageUrl: req.file.path,
         places: []
     });
@@ -43,9 +52,21 @@ const registerUser = async (req, res, next) => {
         console.log(" === USER SUCCESFULLY ADDED ===");
         await newUser.save();
         console.log(newUser.toObject({ getters: true }));
-        res.status(201).json({ "id": newUser._id });
     } catch (err) {
         return next(new HttpError('Something went wrong when trying to create this user! D:', 500));
+    }
+
+    let token;
+    try {
+        token = jwt.sign({
+            userId: newUser.id,
+            email: newUser.email
+        },
+            'zhanghao_wo_ai_ni__ou_xiang',
+            { expiresIn: '1h' })
+        res.status(201).json({ userId: newUser._id, email: newUser.email, token: token});
+    } catch (err) {
+        return next(new HttpError('Something went wrong when generating the token! D:', 401));
     }
 };
 
@@ -62,12 +83,30 @@ const loginUser = async (req, res, next) => {
         return next(new HttpError("Something went wrong when trying to get this email! D:", 500));
     }
 
-    if (user.password != password) {
-        return next(new HttpError("Incorrect password! D:", 401));
+    let isCredentialsCorrect;
+    try {
+        isCredentialsCorrect = await bcrypt.compare(password, user.password);
+    } catch (err) {
+        return next(new HttpError("An error occured while validating your password! D:", 401));
     }
 
-    res.status(200).json({ messsage: "successfully logged in! :D", id: user._id });
-};
+    if (!isCredentialsCorrect) {
+        return next(new HttpError("The password you entered is incorrect! D:", 401));
+    }
+
+    let token;
+    try {
+        token = jwt.sign({
+            userId: user.id,
+            email: user.email
+        },
+            'zhanghao_wo_ai_ni__ou_xiang',
+            { expiresIn: '1h' });
+        res.status(201).json({ userId: user.id, email: user.email, token: token});
+    } catch (err) {
+        console.error(err);
+        return next(new HttpError('Something went wrong when generating the token! D:', 401));
+    }};
 
 
 exports.getAllUsers = getAllUsers;
