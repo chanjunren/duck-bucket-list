@@ -82,7 +82,7 @@ const Auth = props => {
                 formData
             );
             console.log("Signup Response Data: " + JSON.stringify(responseData));
-            authContext.login(responseData.userId);
+            authContext.login(responseData.userId, responseData.token);
         } catch (err) { }
     }
 

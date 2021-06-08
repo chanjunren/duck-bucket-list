@@ -51,7 +51,10 @@ const NewPlace = () => {
 
       await sendRequest("http://localhost:5000/api/places",
         "POST",
-        formData);
+        formData,
+        {
+          Authorization: "Bearer " + context.token
+        });
 
       history.push('/');
 
@@ -73,7 +76,7 @@ const NewPlace = () => {
         label="Title"
         validators={[VALIDATOR_REQUIRE()]}
         errorText="Please enter a valid title" />
-      <ImageUpload 
+      <ImageUpload
         id="placePreviewInput"
         initialMsg="Picture of place"
         onInput={inputHandler}
