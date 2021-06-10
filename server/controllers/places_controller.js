@@ -57,7 +57,7 @@ const createPlace = async (req, res, next) => {
 
   let user;
   try {
-    user = await User.findById(creator);
+    user = await User.findById(req.userData.userId);
   } catch (err) {
     return next(new HttpError("An error occured while looking for the associated creator! D:", 500));
   }
@@ -71,7 +71,7 @@ const createPlace = async (req, res, next) => {
     image: req.file.path,
     address: address,
     location: coordinates,
-    creator: creator
+    creator: req.userData.userId
   });
 
   try {
