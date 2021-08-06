@@ -53,7 +53,7 @@ const Auth = props => {
     const onLoginHandler = async event => {
         event.preventDefault();
         try {
-            const responseData = await sendRequest('http://localhost:5000/api/users/login',
+            const responseData = await sendRequest(`${process.env.REACT_APP_BACKEND_URL}/api/users/login`,
                 'POST',
                 JSON.stringify({
                     email: formState.inputs.emailInput.value,
@@ -77,7 +77,7 @@ const Auth = props => {
             formData.append('password', formState.inputs.passwordInput.value);
             formData.append('imageUrl', formState.inputs.dpInput.value);
 
-            const responseData = await sendRequest('http://localhost:5000/api/users/signup',
+            const responseData = await sendRequest(`${process.env.REACT_APP_BACKEND_URL}/api/users/signup`,
                 'POST',
                 formData
             );
