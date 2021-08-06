@@ -11,7 +11,7 @@ module.exports = (req, res, next) => {
         if (!token) {
             return next(new HttpError("Token not found!", 401));
         }
-        const decodedToken = jwt.verify(token, 'zhanghao_wo_ai_ni__ou_xiang');
+        const decodedToken = jwt.verify(token, process.env.JWT_KEY);
         req.userData = {userId: decodedToken.userId};
         next();
     } catch (err) {

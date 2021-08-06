@@ -47,7 +47,7 @@ app.use((error, req, res, next) => {
 })
 
 mongoose
-    .connect(`mongodb+srv://itsmecjr:woainizhanghao@cluster0.ypgjz.mongodb.net/duck-bucket-list?retryWrites=true&w=majority`,
+    .connect(`mongodb+srv://${process.env.DB_USER}:${process.env.DB_PW}@cluster0.ypgjz.mongodb.net/${process.env.DB_NAME}?retryWrites=true&w=majority`,
         {
             useNewUrlParser: true,
             useUnifiedTopology: true,

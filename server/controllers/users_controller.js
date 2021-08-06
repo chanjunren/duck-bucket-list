@@ -62,7 +62,7 @@ const registerUser = async (req, res, next) => {
             userId: newUser.id,
             email: newUser.email
         },
-            'zhanghao_wo_ai_ni__ou_xiang',
+            process.env.JWT_KEY,
             { expiresIn: '1h' })
         res.status(201).json({ userId: newUser._id, email: newUser.email, token: token});
     } catch (err) {
@@ -100,7 +100,7 @@ const loginUser = async (req, res, next) => {
             userId: user.id,
             email: user.email
         },
-            'zhanghao_wo_ai_ni__ou_xiang',
+            process.env.JWT_KEY,
             { expiresIn: '1h' });
         res.status(201).json({ userId: user.id, email: user.email, token: token});
     } catch (err) {
